@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useParams } from 'next/navigation'
 
 type GameDetails = {
   id: number
@@ -23,7 +24,8 @@ type GameDetails = {
   recommended_requirements?: string
 }
 
-export default function GameDetailsPage({ params }: { params: { id: string } }) {
+export default function GameDetailsPage() {
+  const { id } = useParams() || { id: undefined }
   const [game, setGame] = useState<GameDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeScreenshot, setActiveScreenshot] = useState<string | null>(null)
@@ -33,13 +35,13 @@ export default function GameDetailsPage({ params }: { params: { id: string } }) 
       try {
         // Fetch game details
         const response = await fetch(
-          `https://api.rawg.io/api/games/${params.id}?key=4d7badacf7db4e91b61828704669a4c0`
+          `https://api.rawg.io/api/games/${id}?key=4d7badacf7db4e91b61828704669a4c0`
         )
         const gameData = await response.json()
 
         // Fetch screenshots
         const screenshotsResponse = await fetch(
-          `https://api.rawg.io/api/games/${params.id}/screenshots?key=4d7badacf7db4e91b61828704669a4c0`
+          `https://api.rawg.io/api/games/${id}/screenshots?key=4d7badacf7db4e91b61828704669a4c0`
         )
         const screenshotsData = await screenshotsResponse.json()
 
@@ -60,8 +62,8 @@ export default function GameDetailsPage({ params }: { params: { id: string } }) 
       }
     }
 
-    fetchGameDetails()
-  }, [params.id])
+    if (id) fetchGameDetails()
+  }, [id])
 
   if (loading) {
     return (
